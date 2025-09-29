@@ -15,6 +15,15 @@
 <p>@message</p>
 
 
+<h3>PalindromeComponent</h3>
+
+<input type="text" @bind="myText" placeholder="Enter text here" class="form-control" />
+
+<button class="btn btn-primary mt-2" @onclick="CheckPalindrome">Check Palindrome</button>
+
+<p>@palimmessage</p>
+
+
 @code {
 
     private string? inputNumber { get; set; }
@@ -31,7 +40,6 @@
 
         if (int.TryParse(inputNumber, out int decimalNumber))
         {
-            //message = Convert.ToString(dceimalNumber, 2);
             if (decimalNumber == 0)
             {
                 message = "0";
@@ -42,8 +50,10 @@
             while (decimalNumber > 0)
             {
                 int remainder = decimalNumber % 2; // Get the remainder
+                Console.WriteLine($"Decimal Number: {decimalNumber}, Remainder: {remainder}");
                 binaryResult.Insert(0, remainder); // Prepend the remainder to the result
-                decimalNumber /= 2; // Update the decimal number to the quotient
+                decimalNumber /= 2; // Update the decimal number to the quotient (  DIVIDED /2 AND UPDATE THE RESULT)
+                Console.WriteLine($"Updated Decimal Number: {decimalNumber}");
             }
 
             message = binaryResult.ToString();
@@ -52,40 +62,83 @@
         {
             message = "Invalid decimal number.";
         } 
-    
+
     }
 
     private void ConverToDecimal()
     {
-          if (string.IsNullOrWhiteSpace(inputNumber))
+        if (string.IsNullOrWhiteSpace(inputNumber))
+        {
+            message = "Please enter a valid binary number.";
+            return;
+        }
+
+        try
+        {
+            String binaryString = inputNumber.ToString();
+
+            int decimalValue = 0;
+            int power = 0;
+
+            // Iterate from the rightmost digit (least significant bit)
+            for (int i = binaryString.Length - 1; i >= 0; i--)
             {
-                message = "Please enter a valid binary number.";
+                if (binaryString[i] == '1')
+                {
+                    // Add 2 raised to the power of its position
+                    decimalValue += (int)Math.Pow(2, power);
+                }
+                power++; // Increment the power for the next digit
+            }
+            if (decimalValue == 0)
+            {
+                message = binaryString;
                 return;
             }
+                    message = decimalValue.ToString();
 
-            try
-            {
-                String binaryString = inputNumber.Trim();
-                int decimalValue = 0;
-                int power = 0;
-
-                // Iterate from the rightmost digit (least significant bit)
-                for (int i = binaryString.Length - 1; i >= 0; i--)
-                {
-                    if (binaryString[i] == '1')
-                    {
-                        // Add 2 raised to the power of its position
-                        decimalValue += (int)Math.Pow(2, power);
-                    }
-                    power++; // Increment the power for the next digit
-                }
-
-                message = decimalValue.ToString();
             }
             catch (FormatException)
             {
                 message = "Invalid binary number.";
             }
+    }
+
+
+   private string myText { get; set; } = string.Empty;
+   private string palimmessage { get; set; } = string.Empty;
+
+   private void CheckPalindrome()
+   {
+        if (string.IsNullOrWhiteSpace(myText))
+        {
+            palimmessage = "Please enter a word or phrase.";
+            return;
+        }
+
+        // Normalize: remove spaces and make lowercase
+        var cleaned = new string(myText
+            .ToLower()
+            .Where(char.IsLetterOrDigit)
+            .ToArray());
+
+        bool isPalindrome = true;
+        for(int i=0, j=cleaned.Length-1; i<cleaned.Length; i++, j--)
+        {
+            Console.WriteLine($"Char {i}: {cleaned[i]} vs {cleaned[j]}");
+            if (cleaned[i] != cleaned[j])
+            {
+                Console.WriteLine("Mismatch found, not a palindrome.");
+                palimmessage = $"❌ '{myText}' is not a palindrome.";
+                isPalindrome = false;
+                break;
+            }
+        }
+        if (isPalindrome){
+            palimmessage = $"✅ '{myText}' is a palindrome!";
+            Console.WriteLine("It's a palindrome!");
+        }
+
     }
 
 }
